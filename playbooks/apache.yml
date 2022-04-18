@@ -1,0 +1,11 @@
+---
+- hosts: _ipserv_
+  become: true
+  tasks:
+    - name: installation apache
+      apt: name=apache2 state=present
+
+    - name: demarre le service
+      service: name=apache2 state=reloaded
+
+
