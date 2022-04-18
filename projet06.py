@@ -15,7 +15,7 @@ import logging
 
 # Paramètrage du logging
 logging.basicConfig(filename='projet06.log', encoding='utf-8', level=logging.INFO)
-logging.info('démarrage de retest.py')
+logging.info('démarrage de projet06.py')
 
 # FONCTIONS
 
@@ -30,7 +30,7 @@ def removeTemp():
         os.remove('fichyaml.yml')
 logging.info('Nettoyage des fichiers temporaires effectuée')
 
-
+logging
 # Fonction qui récupère l'adresse IP d'une machine libre
 def choixserver():
     chaine = "libre"  # text à rechercher
@@ -77,9 +77,14 @@ def modifIp():
 # Fonction qui crée le fichier yaml temporaire pour lancer la commande Ansible
 def createFichyaml():
     global adrIp
-    fichier = open(plbook, "r")             # ouvre le template yaml en lecture
-    lignes = fichier.readlines()            # enregistre chaque ligne dans une liste
-    fichier.close()                         # ferme le template yaml
+    try:
+        fichier = open(plbook, "r")             # ouvre le template yaml en lecture
+        lignes = fichier.readlines()            # enregistre chaque ligne dans une liste
+        fichier.close()                         # ferme le template yaml
+    except:
+        logging.error('chemin non valide')
+
+
     lignes[1] = "- hosts: " + adrIp + "\n"  # modifie la seconde ligne avec l'adresse IP trouvé
     fichtemp = open("fichyaml.yml", "w")    # ouvre le fichier yaml temporaire
     fichtemp.writelines(lignes)             # recopie les lignes
