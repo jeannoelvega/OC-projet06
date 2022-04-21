@@ -23,29 +23,30 @@ logging.info('démarrage de projet06.py')
 def removeTemp():
     if os.path.exists('fichtemp.txt'):
         os.remove('fichtemp.txt')
-    else:
-        print("fichtemp.txt n'existe pas \n")
 
     if os.path.exists('fichyaml.yml'):
         os.remove('fichyaml.yml')
 logging.info('Nettoyage des fichiers temporaires effectuée')
 
-logging
+
 # Fonction qui récupère l'adresse IP d'une machine libre
 def choixserver():
     chaine = "libre"  # text à rechercher
-    fichtemp = open("fichtemp.txt", "r")  # ouvre le fichier txt temporaire
-    ipfind = False      # pour l'instant, on n'a pas trouvé d'IP
-    for ligne in fichtemp:  #  parcoure fichtemp.txt
-        if chaine in ligne: #  si on trouve le mot "libre"...
-            ipfind = True   #  ...c'est qu'on a une adresse IP
-            global adressIp
-            adressIp = ligne.split()    # découpe la ligne en liste de str
-            adressIp.remove( "libre")   # enleve le mot "libre" de la liste 
-            global adrIp
-            adrIp = adressIp
-            break
-    fichtemp.close()
+    try:
+        fichtemp = open("fichtemp.txt", "r")  # ouvre le fichier txt temporaire
+        ipfind = False      # pour l'instant, on n'a pas trouvé d'IP
+        for ligne in fichtemp:  #  parcoure fichtemp.txt
+            if chaine in ligne: #  si on trouve le mot "libre"...
+                ipfind = True   #  ...c'est qu'on a une adresse IP
+                global adressIp
+                adressIp = ligne.split()    # découpe la ligne en liste de str
+                adressIp.remove( "libre")   # enleve le mot "libre" de la liste 
+                global adrIp
+                adrIp = adressIp
+                break
+        fichtemp.close()
+    except:
+        logging.error('une erreur est survenu ligne 36 à 47')
 
     if ipfind == False:     #  si on n'a pas trouvé d'adresse IP libre
         print("il n'y a plus de machines libres")
@@ -60,18 +61,22 @@ def modifIp():
     global adrIp                 
     adrIp = ' '.join(adrIp)                 # met en format str
     chaine = adrIp  
-    fichtemp = open("fichtemp.txt", "r")    # ouvre le fichier temporaire en lecture seule
-    fichier = open("fichier.txt", "w")      # ouvre fichier.txt en écriture
-    for ligne in fichtemp:                  # lis chaque ligne de fichtemp dans une boucle for
-        if chaine in ligne:                 # si l'adresse IP est dans la ligne...
-            adressIp = ligne.split()        # découpe la ligne en liste de str
-            adressIp.remove( "libre")       # enleve le mot "libre" de la liste
-            adressIp = ' '.join(adressIp)   # transforme la liste en str
-            adressIp = adressIp + "\n"      # ajoute un saut de ligne
-            ligne = adressIp                # met la valeur dans la variable ligne
-        fichier.write(ligne)                # écrit la ligne dans le fichier texte
-    fichtemp.close()                        # ferme le fichier temporaire
-    fichier.close()                         # ferme fichier.txt
+    try:
+        fichtemp = open("fichtemp.txt", "r")    # ouvre le fichier temporaire en lecture seule
+        fichier = open("fichier.txt", "w")      # ouvre fichier.txt en écriture
+        for ligne in fichtemp:                  # lis chaque ligne de fichtemp dans une boucle for
+            if chaine in ligne:                 # si l'adresse IP est dans la ligne...
+                adressIp = ligne.split()        # découpe la ligne en liste de str
+                adressIp.remove( "libre")       # enleve le mot "libre" de la liste
+                adressIp = ' '.join(adressIp)   # transforme la liste en str
+                adressIp = adressIp + "\n"      # ajoute un saut de ligne
+                ligne = adressIp                # met la valeur dans la variable ligne
+            fichier.write(ligne)                # écrit la ligne dans le fichier texte
+        fichtemp.close()                        # ferme le fichier temporaire
+        fichier.close()                         # ferme fichier.txt
+    except:
+        logging.error('Problème avec les fichiers fichtemp.txt et/ou fichier.txt')
+
     logging.info('fichier.txt modifié')
 
 # Fonction qui crée le fichier yaml temporaire pour lancer la commande Ansible
@@ -86,27 +91,38 @@ def createFichyaml():
 
 
     lignes[1] = "- hosts: " + adrIp + "\n"  # modifie la seconde ligne avec l'adresse IP trouvé
-    fichtemp = open("fichyaml.yml", "w")    # ouvre le fichier yaml temporaire
-    fichtemp.writelines(lignes)             # recopie les lignes
-    fichtemp.close()                        # ferme le fichier yaml temporaire
+    try:
+        fichtemp = open("fichyaml.yml", "w")    # ouvre le fichier yaml temporaire
+        fichtemp.writelines(lignes)             # recopie les lignes
+        fichtemp.close()                        # ferme le fichier yaml temporaire
+    except:
+        logging.error("Problème d'écriture dans le fichier fichyaml.yml")
+
     logging.info('Création du fichier yaml terminée')
 
 # Fonction qui crée un fichier temporaire pour la recherche d'une machine libre 
 # et pour modifier cette machine en occupé.
 def copyfich():
 # copie le fichier des adresses IP à l'identique dans un fichier temporaire
-    fichier = open("fichier.txt", "r")
-    fichtemp = open("fichtemp.txt", "w")
-    fichtemp.write(fichier.read() )
-    fichier.close()
-    fichtemp.close()
+    try:
+        fichier = open("fichier.txt", "r")
+        fichtemp = open("fichtemp.txt", "w")
+        fichtemp.write(fichier.read() )
+        fichier.close()
+        fichtemp.close()
+    except:
+        logging.error('problème de copie de fichier.txt vers fichtemp.txt')
+
     logging.info('Création du fichier temporaire txt terminée')
 
 # Fonction qui installe les playbooks
 def installplaybook():
-    subprocess.call(["ansible-playbook", "/root/fichyaml.yml"])
-    print("playbook lancé ")
-    logging.info('Playbook lancé')
+    try:
+        subprocess.call(["ansible-playbook", "/root/fichyaml.yml"])
+        print("playbook lancé ")
+        logging.info('Playbook lancé')
+    except:
+        logging.error('Problème avec le lancement du playbook fichyaml.yml')
 
 # Fonction principal qui lance les autres fonctions dans l'ordre
 def principal():
@@ -125,14 +141,17 @@ listService = {}
 listPlaybook = {}
 
 # Remplissage des dictionnaires avec notre menu
-fileini = open("config.ini", "r")       #fichier de configuration de notre menu
-for line in fileini :
-    key = int(line.split()[0])
-    name = line.split()[1]
-    path = line.split()[2]
-    listService[key] = name
-    listPlaybook[key] = path
-fileini.close()
+try:
+    fileini = open("config.ini", "r")       #fichier de configuration de notre menu
+    for line in fileini :
+        key = int(line.split()[0])
+        name = line.split()[1]
+        path = line.split()[2]
+        listService[key] = name
+        listPlaybook[key] = path
+    fileini.close()
+except:
+    logging.error('problème avec le fichier config.ini')
 
 # récupère le nombre d'items dans notre menu
 tailleDic = len(listService)
