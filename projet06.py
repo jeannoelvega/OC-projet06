@@ -5,19 +5,29 @@ global adrIp, adressIp, plbook
 # MODULES 
 
 # Permet de lancer des commandes avec le system
+from cgitb import handler
 import subprocess
 
 # Permet d'utiliser des commandes courantes de tous les OS
 import os
 
-# Permet le 'logging'
+# Permet la journalisation et la rotation
 import logging
+import time
+from logging.handlers import RotatingFileHandler
 
-# Paramètrage du logging
-logging.basicConfig(filename='projet06.log', encoding='utf-8', level=logging.INFO)
+# Paramètrage de la journalisation
+logging.basicConfig(filename='projet06.log', encoding='utf-8', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S')
+RotatingFileHandler(filename='projet06.log', mode='a', maxBytes=100, backupCount=1, encoding='utf-8')
+RotatingFileHandler.doRollover()        # Effectue la rotation du fichier
 logging.info('démarrage de projet06.py')
 
 # FONCTIONS
+
+# Fonction qui gère la rotation du fichier de journalisation projet06.log
+def timedRotatingLog(path):
+    logger = logging.getLogger("Rotating Log")
+    handler = RotatingFileHandler(filename='projet06.log', mode='a', maxBytes=100, backupCount=1, encoding='utf-8')
 
 # Fonction de nettoyage des fichiers temporaires
 def removeTemp():
