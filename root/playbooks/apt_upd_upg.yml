@@ -1,0 +1,46 @@
+---
+- hosts: server1
+  become: true
+  tasks:
+    - name: apt update
+      apt:
+        update_cache: yes
+
+    - name: apt upgrade
+      apt:
+        upgrade: yes
+
+- hosts: server2
+  become: true
+  tasks:
+    - name: apt update
+      apt:
+        update_cache: yes
+
+    - name: apt upgrade
+      apt:
+        upgrade: yes
+
+- hosts: server3
+  become: true
+  tasks:
+    - name: apt update
+      apt:
+        update_cache: yes
+
+    - name: apt upgrade
+      apt:
+        upgrade: yes
+
+- hosts: server4
+  become: true
+  tasks:
+    - name: apt update
+      apt:
+        update_cache: yes
+
+    - name: apt upgrade
+      apt:
+        upgrade: yes
+
+

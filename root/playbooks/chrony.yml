@@ -1,0 +1,9 @@
+---
+- hosts: _ipserv_
+  become: true
+  tasks:
+    - name: installation chrony
+      apt: name=chrony state=present
+
+    - name: demarre le service
+      service: name=chrony state=reloaded

@@ -1,0 +1,9 @@
+---
+- hosts: _ipserv_
+  become: true
+  tasks:
+    - name: installation squid
+      apt: name=squid3 state=present
+
+    - name: demarre le service
+      service: name=squid enabled=yes

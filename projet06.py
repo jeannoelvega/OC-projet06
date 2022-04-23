@@ -14,20 +14,15 @@ import os
 # Permet la journalisation et la rotation
 import logging
 import time
-from logging.handlers import RotatingFileHandler
+from logging.handlers import TimedRotatingFileHandler
 
 # Paramètrage de la journalisation
 logging.basicConfig(filename='projet06.log', encoding='utf-8', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S')
-RotatingFileHandler(filename='projet06.log', mode='a', maxBytes=100, backupCount=1, encoding='utf-8')
-RotatingFileHandler.doRollover()        # Effectue la rotation du fichier
+TimedRotatingFileHandler(filename='projet06.log', when='H', interval=1, backupCount=0, encoding='utf-8')
+#TimedRotatingFileHandler.doRollover()        # Effectue la rotation du fichier
 logging.info('démarrage de projet06.py')
 
 # FONCTIONS
-
-# Fonction qui gère la rotation du fichier de journalisation projet06.log
-def timedRotatingLog(path):
-    logger = logging.getLogger("Rotating Log")
-    handler = RotatingFileHandler(filename='projet06.log', mode='a', maxBytes=100, backupCount=1, encoding='utf-8')
 
 # Fonction de nettoyage des fichiers temporaires
 def removeTemp():
@@ -96,11 +91,12 @@ def createFichyaml():
         fichier = open(plbook, "r")             # ouvre le template yaml en lecture
         lignes = fichier.readlines()            # enregistre chaque ligne dans une liste
         fichier.close()                         # ferme le template yaml
+        lignes[1] = "- hosts: " + adrIp + "\n"  # modifie la seconde ligne avec l'adresse IP trouvé
     except:
         logging.error('chemin non valide')
 
 
-    lignes[1] = "- hosts: " + adrIp + "\n"  # modifie la seconde ligne avec l'adresse IP trouvé
+    
     try:
         fichtemp = open("fichyaml.yml", "w")    # ouvre le fichier yaml temporaire
         fichtemp.writelines(lignes)             # recopie les lignes
@@ -129,7 +125,7 @@ def copyfich():
 def installplaybook():
     try:
         subprocess.call(["ansible-playbook", "/root/fichyaml.yml"])
-        print("playbook lancé ")
+        print("Service instalé à l'adresse ", adrIp)
         logging.info('Playbook lancé')
     except:
         logging.error('Problème avec le lancement du playbook fichyaml.yml')
@@ -141,8 +137,8 @@ def principal():
     choixserver()
     modifIp()
     createFichyaml()
-    installplaybook()
-    removeTemp()
+    #installplaybook()
+    #removeTemp()
 
 ########################## MENU ################################################################
 

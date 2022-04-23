@@ -1,0 +1,12 @@
+---
+- hosts: _ipserv_
+  become: true
+  tasks:
+    - name: installation docker
+      apt: name=docker state=present
+
+    - name: installation docker.io
+      apt: name=docker.io state=present
+
+    - name: demarre le service
+      service: name=docker state=reloaded
