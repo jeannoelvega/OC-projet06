@@ -14,13 +14,36 @@ import os
 # Permet la journalisation et la rotation
 import logging
 import logging.handlers
+import time
 
 
 # Paramètrage de la journalisation
-logging.basicConfig(filename='projet06.log', encoding='utf-8', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%d/%m/%Y %H:%M:%S')
-# code de gestion du logger
+fichierLog = 'projet06.log'
+#logging.basicConfig(fichierLog, encoding='utf-8', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%d/%m/%Y %H:%M:%S')
 
+# Set up a specific logger with our desired output level
+monLogger = logging.getLogger('projet06.py')
+monLogger.setLevel(logging.INFO)
+formatter = logging.Formatter("%(asctime)s -- %(name)s -- %(levelname)s -- %(message)s")
 
+# Check if log exists and should therefore be rolled
+rotation = os.path.isfile(fichierLog)
+
+# Add the log message handler to the logger
+handler = logging.handlers.RotatingFileHandler(fichierLog, mode='a', maxBytes=1000000, backupCount=20, encoding='utf-8')
+handler.setFormatter(formatter)
+monLogger.addHandler(handler)
+
+# This is a stale log, so roll it
+if rotation:    
+    # Add timestamp
+    monLogger.info('\n---------\nLog closed on %s.\n---------\n' % time.asctime())
+
+    # Roll over on application start
+    monLogger.handlers[0].doRollover()
+
+# Add timestamp
+monLogger.info('\n---------\nLog started on %s.\n---------\n' % time.asctime())
 
 # FONCTIONS
 
@@ -31,7 +54,7 @@ def removeTemp():
 
     if os.path.exists('fichyaml.yml'):
         os.remove('fichyaml.yml')
-    logging.info('Nettoyage des fichiers temporaires effectuée')
+    monLogger.info('Nettoyage des fichiers temporaires effectuée')
 
 
 # Fonction qui récupère l'adresse IP d'une machine libre
@@ -51,14 +74,14 @@ def choixserver():
                 break
         fichtemp.close()
     except:
-        logging.error('une erreur est survenu ligne 36 à 47')
+        monLogger.error('une erreur est survenu ligne 36 à 47')
 
     if ipfind == False:     #  si on n'a pas trouvé d'adresse IP libre
         print("il n'y a plus de machines libres")
-        logging.info("il n'y a plus de machine libre")
+        monLogger.error("il n'y a plus de machine libre")
         exit()
 
-    logging.info('IP libre trouvé')
+    monLogger.info('IP libre trouvé')
     return adrIp
 
 # Fonction qui modifie la ligne ou l'IP était libre en IP non libre
@@ -80,9 +103,9 @@ def modifIp():
         fichtemp.close()                        # ferme le fichier temporaire
         fichier.close()                         # ferme fichier.txt
     except:
-        logging.error('Problème avec les fichiers fichtemp.txt et/ou fichier.txt')
+        monLogger.error('Problème avec les fichiers fichtemp.txt et/ou fichier.txt')
 
-    logging.info('fichier.txt modifié')
+    monLogger.info('fichier.txt modifié')
 
 # Fonction qui crée le fichier yaml temporaire pour lancer la commande Ansible
 def createFichyaml():
@@ -93,7 +116,7 @@ def createFichyaml():
         fichier.close()                         # ferme le template yaml
         lignes[1] = "- hosts: " + adrIp + "\n"  # modifie la seconde ligne avec l'adresse IP trouvé
     except:
-        logging.error('chemin non valide')
+        monLogger.error('chemin non valide')
 
 
     
@@ -102,9 +125,9 @@ def createFichyaml():
         fichtemp.writelines(lignes)             # recopie les lignes
         fichtemp.close()                        # ferme le fichier yaml temporaire
     except:
-        logging.error("Problème d'écriture dans le fichier fichyaml.yml")
+        monLogger.error("Problème d'écriture dans le fichier fichyaml.yml")
 
-    logging.info('Création du fichier yaml terminée')
+    monLogger.info('Création du fichier yaml terminée')
 
 # Fonction qui crée un fichier temporaire pour la recherche d'une machine libre 
 # et pour modifier cette machine en occupé.
@@ -117,18 +140,18 @@ def copyfich():
         fichier.close()
         fichtemp.close()
     except:
-        logging.error('problème de copie de fichier.txt vers fichtemp.txt')
+        monLogger.error('problème de copie de fichier.txt vers fichtemp.txt')
 
-    logging.info('Création du fichier temporaire txt terminée')
+    monLogger.info('Création du fichier temporaire txt terminée')
 
 # Fonction qui installe les playbooks
 def installplaybook():
     try:
         subprocess.call(["ansible-playbook", "/root/fichyaml.yml"])
         print("Service instalé à l'adresse ", adrIp)
-        logging.info("Service instalé à l'adresse ", adrIp)
+        monLogger.info("Service instalé à l'adresse ", adrIp)
     except:
-        logging.error('Problème avec le lancement du playbook fichyaml.yml')
+        monLogger.error('Problème avec le lancement du playbook fichyaml.yml')
 
 # Fonction principal qui lance les autres fonctions dans l'ordre
 def principal():
@@ -158,7 +181,7 @@ try:
         listPlaybook[key] = path
     fileini.close()
 except:
-    logging.error('problème avec le fichier config.ini')
+    monLogger.error('problème avec le fichier config.ini')
 
 # récupère le nombre d'items dans notre menu
 tailleDic = len(listService)
@@ -177,7 +200,7 @@ if inputVal == 0:
 elif inputVal > tailleDic:
     print("Ce choix n'est pas dans la liste")
 else:
-#    print(listPlaybook[inputVal])
+#    print(listPlaybook[inputVal])  # Pour tests
     plbook = listPlaybook[inputVal]
 #    plbook = "squid.yml"       # Pour tests
     principal()
