@@ -5,7 +5,7 @@ global adrIp, adressIp, plbook
 # MODULES 
 
 # Permet de lancer des commandes avec le system
-from cgitb import handler
+
 import subprocess
 
 # Permet d'utiliser des commandes courantes de tous les OS
@@ -13,14 +13,14 @@ import os
 
 # Permet la journalisation et la rotation
 import logging
-import time
-from logging.handlers import TimedRotatingFileHandler
+import logging.handlers
+
 
 # Paramètrage de la journalisation
-logging.basicConfig(filename='projet06.log', encoding='utf-8', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %I:%M:%S')
-TimedRotatingFileHandler(filename='projet06.log', when='H', interval=1, backupCount=0, encoding='utf-8')
-#TimedRotatingFileHandler.doRollover()        # Effectue la rotation du fichier
-logging.info('démarrage de projet06.py')
+logging.basicConfig(filename='projet06.log', encoding='utf-8', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%d/%m/%Y %H:%M:%S')
+# code de gestion du logger
+
+
 
 # FONCTIONS
 
@@ -31,7 +31,7 @@ def removeTemp():
 
     if os.path.exists('fichyaml.yml'):
         os.remove('fichyaml.yml')
-logging.info('Nettoyage des fichiers temporaires effectuée')
+    logging.info('Nettoyage des fichiers temporaires effectuée')
 
 
 # Fonction qui récupère l'adresse IP d'une machine libre
@@ -126,7 +126,7 @@ def installplaybook():
     try:
         subprocess.call(["ansible-playbook", "/root/fichyaml.yml"])
         print("Service instalé à l'adresse ", adrIp)
-        logging.info('Playbook lancé')
+        logging.info("Service instalé à l'adresse ", adrIp)
     except:
         logging.error('Problème avec le lancement du playbook fichyaml.yml')
 
@@ -142,6 +142,7 @@ def principal():
 
 ########################## MENU ################################################################
 
+logging.info('démarrage de projet06.py')
 # Création des dictionnaires vides
 listService = {}
 listPlaybook = {}
