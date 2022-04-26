@@ -11,12 +11,8 @@
 * Un des serveurs sera le noeud principal où sera installé obligatoirement Ansible.
 * Sur le noeud principal, il faut obligatoirement Python version 3.9 ou ultérieur.
 * Les autres serveurs auront un acces SSH en root avec le même mot de passe pour tous.
-* Les adresses IP des noeuds secondaires seront dans le fichier fichier.txt.
-* Les templates d'Ansible seront dans le répertoire playbooks dans le noeud principal.
-
-# Le script ansible.py 
-
-Il permet d'installer automatiquement Ansible sur le noeud principal.
+* Les adresses IP des noeuds secondaires seront dans le fichier ipFile.txt.
+* Les templates d'Ansible seront dans le répertoire root/playbooks dans le noeud principal.
 
 # Le script projet06.py
 
@@ -31,12 +27,12 @@ le fichier se présente ainsi:
 1 http /chemin/fichier/yaml
 2 dns /chemin/fichier/yaml
 
-# Le fichier fichier.txt
+# Le fichier ipFile.txt
 
 Ce fichier liste les adresses IP des noeuds secondaires où seront installé les services.
 
 Les adresses IP libres sont indiquées ainsi:
-xxx.xxx.xxx.xxx  libre
+xxx.xxx.xxx.xxx  free
 
 Les adresses IP utilisées sont indiquées comme suit:
 xxx.xxx.xxx.xxx
