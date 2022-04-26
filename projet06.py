@@ -1,207 +1,203 @@
-# variables globales
-
+# global variables
 global adrIp, adressIp, plbook
 
 # MODULES 
-
-# Permet de lancer des commandes avec le system
-
+# Allows to launch commands with the system
 import subprocess
 
-# Permet d'utiliser des commandes courantes de tous les OS
+# Allows to use common commands of all OS
 import os
 
-# Permet la journalisation et la rotation
+# Allows logging and rotation
 import logging
 import logging.handlers
 import time
 
-
-# Paramètrage de la journalisation
-fichierLog = 'projet06.log'
-#logging.basicConfig(fichierLog, encoding='utf-8', level=logging.INFO, format='%(asctime)s %(message)s', datefmt='%d/%m/%Y %H:%M:%S')
+# Logging settings
+logFile = 'projet06.log'
 
 # Set up a specific logger with our desired output level
-monLogger = logging.getLogger('projet06.py')
-monLogger.setLevel(logging.INFO)
+myLogger = logging.getLogger('projet06.py')
+myLogger.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s -- %(name)s -- %(levelname)s -- %(message)s")
 
 # Check if log exists and should therefore be rolled
-rotation = os.path.isfile(fichierLog)
+rotation = os.path.isfile(logFile)
 
 # Add the log message handler to the logger
-handler = logging.handlers.RotatingFileHandler(fichierLog, mode='a', maxBytes=1000000, backupCount=20, encoding='utf-8')
+handler = logging.handlers.RotatingFileHandler(logFile, mode='a', maxBytes=1000000, backupCount=20, encoding='utf-8')
 handler.setFormatter(formatter)
-monLogger.addHandler(handler)
+myLogger.addHandler(handler)
 
 # This is a stale log, so roll it
 if rotation:    
     # Add timestamp
-    monLogger.info('\n---------\nLog closed on %s.\n---------\n' % time.asctime())
+    myLogger.info('\n---------\nLog closed on %s.\n---------\n' % time.asctime())
 
     # Roll over on application start
-    monLogger.handlers[0].doRollover()
+    myLogger.handlers[0].doRollover()
 
 # Add timestamp
-monLogger.info('\n---------\nLog started on %s.\n---------\n' % time.asctime())
+myLogger.info('\n---------\nLog started on %s.\n---------\n' % time.asctime())
 
 # FONCTIONS
 
-# Fonction de nettoyage des fichiers temporaires
+# Function for cleaning temporary files
 def removeTemp():
-    if os.path.exists('fichtemp.txt'):
-        os.remove('fichtemp.txt')
+    if os.path.exists('tempFile.txt'):
+        os.remove('tempFile.txt')
 
-    if os.path.exists('fichyaml.yml'):
-        os.remove('fichyaml.yml')
-    monLogger.info('Nettoyage des fichiers temporaires effectuée')
+    if os.path.exists('yamlFile.yml'):
+        os.remove('yamlFile.yml')
+    myLogger.info('Cleaning of temporary files done')
 
 
-# Fonction qui récupère l'adresse IP d'une machine libre
-def choixserver():
-    chaine = "libre"  # text à rechercher
+# Function that retrieves the IP address of a free pc
+def serverChoice():
+    word = "free"  # text to search
     try:
-        fichtemp = open("fichtemp.txt", "r")  # ouvre le fichier txt temporaire
-        ipfind = False      # pour l'instant, on n'a pas trouvé d'IP
-        for ligne in fichtemp:  #  parcoure fichtemp.txt
-            if chaine in ligne: #  si on trouve le mot "libre"...
-                ipfind = True   #  ...c'est qu'on a une adresse IP
+        tempFile = open("tempFile.txt", "r")  
+        ipfind = False                     # for the moment, we have not found an IP
+        for line in tempFile:              # browse tempFile.txt
+            if word in line:               # if we find the word "free"...
+                ipfind = True              # ...we have an IP address
                 global adressIp
-                adressIp = ligne.split()    # découpe la ligne en liste de str
-                adressIp.remove( "libre")   # enleve le mot "libre" de la liste 
+                adressIp = line.split()    # split the line into a list of character strings
+                adressIp.remove( "free")   # remove the word "free" from the list
                 global adrIp
                 adrIp = adressIp
                 break
-        fichtemp.close()
+        tempFile.close()
     except:
-        monLogger.error('une erreur est survenu ligne 36 à 47')
+        myLogger.error('an error occurred while retrieving the IP address')
 
-    if ipfind == False:     #  si on n'a pas trouvé d'adresse IP libre
-        print("il n'y a plus de machines libres")
-        monLogger.error("il n'y a plus de machine libre")
+    if ipfind == False:     #  si on n'a pas trouvé d'adresse IP free
+        print("there is no more free IP address")
+        myLogger.error("there is no more free IP address")
         exit()
 
-    monLogger.info('IP libre trouvé')
+    myLogger.info('End of IP address processing')
     return adrIp
 
-# Fonction qui modifie la ligne ou l'IP était libre en IP non libre
-def modifIp():
+# Function that changes the line where the IP was free to IP used
+def ipModify():
     global adrIp                 
-    adrIp = ' '.join(adrIp)                 # met en format str
-    chaine = adrIp  
+    adrIp = ' '.join(adrIp)                     # put adrIp in string format
+    word = adrIp  
     try:
-        fichtemp = open("fichtemp.txt", "r")    # ouvre le fichier temporaire en lecture seule
-        fichier = open("fichier.txt", "w")      # ouvre fichier.txt en écriture
-        for ligne in fichtemp:                  # lis chaque ligne de fichtemp dans une boucle for
-            if chaine in ligne:                 # si l'adresse IP est dans la ligne...
-                adressIp = ligne.split()        # découpe la ligne en liste de str
-                adressIp.remove( "libre")       # enleve le mot "libre" de la liste
-                adressIp = ' '.join(adressIp)   # transforme la liste en str
-                adressIp = adressIp + "\n"      # ajoute un saut de ligne
-                ligne = adressIp                # met la valeur dans la variable ligne
-            fichier.write(ligne)                # écrit la ligne dans le fichier texte
-        fichtemp.close()                        # ferme le fichier temporaire
-        fichier.close()                         # ferme fichier.txt
+        tempFile = open("tempFile.txt", "r")    # open tempFile.txt as read-only
+        ipFile = open("ipFile.txt", "w")        # open ipFile.txt for writing
+        for line in tempFile:                   # read each line of tempFile.txt in a for loop
+            if word in line:                    # if the IP address is in the line...
+                adressIp = line.split()         # split the line into a string list
+                adressIp.remove( "free")        # remove the word "free" from the list
+                adressIp = ' '.join(adressIp)   # transform the list into a string
+                adressIp = adressIp + "\n"      # add a line break
+                line = adressIp                 # put the IP address alone in the line variable
+            ipFile.write(line)                  # write line to ipFile.txt
+        tempFile.close()                        # close tempFile.txt
+        ipFile.close()                          # close ipFile.txt
     except:
-        monLogger.error('Problème avec les fichiers fichtemp.txt et/ou fichier.txt')
+        myLogger.error('Problem with tempFile.txt and/or ipFile.txt')
 
-    monLogger.info('fichier.txt modifié')
+    myLogger.info('ipFile.txt modified correctly')
 
-# Fonction qui crée le fichier yaml temporaire pour lancer la commande Ansible
+# Function that creates the temporary yaml file to launch the Ansible command
 def createFichyaml():
     global adrIp
     try:
-        fichier = open(plbook, "r")             # ouvre le template yaml en lecture
-        lignes = fichier.readlines()            # enregistre chaque ligne dans une liste
-        fichier.close()                         # ferme le template yaml
-        lignes[1] = "- hosts: " + adrIp + "\n"  # modifie la seconde ligne avec l'adresse IP trouvé
+        ipFile = open(plbook, "r")              # open yaml template read-only
+        line = ipFile.readlines()               # save each line to a list
+        ipFile.close()                          # close the yaml template
+        line[1] = "- hosts: " + adrIp + "\n"    # modify the second line with the IP address found
     except:
-        monLogger.error('chemin non valide')
-
+        myLogger.error('invalid path')
 
     
     try:
-        fichtemp = open("fichyaml.yml", "w")    # ouvre le fichier yaml temporaire
-        fichtemp.writelines(lignes)             # recopie les lignes
-        fichtemp.close()                        # ferme le fichier yaml temporaire
+        tempFile = open("yamlFile.yml", "w")    # open yamlFile.yml for writing
+        tempFile.writelines(line)               # copy the lines
+        tempFile.close()                        # close yamlFile.yml
     except:
-        monLogger.error("Problème d'écriture dans le fichier fichyaml.yml")
+        myLogger.error("Problem writing to yamlFile.yml file")
 
-    monLogger.info('Création du fichier yaml terminée')
+    myLogger.info('Creation of temporary file yamlFile.yml completed')
 
-# Fonction qui crée un fichier temporaire pour la recherche d'une machine libre 
-# et pour modifier cette machine en occupé.
+# Function that creates a temporary file for finding
+# and changing the state of IP addresses
 def copyfich():
-# copie le fichier des adresses IP à l'identique dans un fichier temporaire
+# copy the IP addresses file identically to a temporary file
     try:
-        fichier = open("fichier.txt", "r")
-        fichtemp = open("fichtemp.txt", "w")
-        fichtemp.write(fichier.read() )
-        fichier.close()
-        fichtemp.close()
+        ipFile = open("ipFile.txt", "r")
+        tempFile = open("tempFile.txt", "w")
+        tempFile.write(ipFile.read() )
+        ipFile.close()
+        tempFile.close()
     except:
-        monLogger.error('problème de copie de fichier.txt vers fichtemp.txt')
+        myLogger.error('problem copying ipFile.txt to tempFile.txt')
 
-    monLogger.info('Création du fichier temporaire txt terminée')
+    myLogger.info('Creation of copy of ipFile.txt completed')
 
-# Fonction qui installe les playbooks
-def installplaybook():
+# Function that installs playbooks
+def installPlaybook():
     try:
-        subprocess.call(["ansible-playbook", "/root/fichyaml.yml"])
-        print("Service instalé à l'adresse ", adrIp)
-        monLogger.info("Service instalé à l'adresse ", adrIp)
+        subprocess.call(["ansible-playbook", "/root/yamlFile.yml"])
+        print("Service installed at ", adrIp)
+        myLogger.info("Service installed at ", adrIp)
     except:
-        monLogger.error('Problème avec le lancement du playbook fichyaml.yml')
+        myLogger.error('Problem with launching yamlFile.yml playbook')
 
-# Fonction principal qui lance les autres fonctions dans l'ordre
-def principal():
+# Main function which launches the other functions in order
+def myProgram():
 
     copyfich()
-    choixserver()
-    modifIp()
+    serverChoice()
+    ipModify()
     createFichyaml()
-    #installplaybook()
-    #removeTemp()
+    #installPlaybook()
+    removeTemp()
 
 ########################## MENU ################################################################
 
-logging.info('démarrage de projet06.py')
-# Création des dictionnaires vides
-listService = {}
-listPlaybook = {}
+myLogger.info('start of project06.py')
+# Creation of empty dictionaries
+serviceList = {}
+playbookList = {}
 
-# Remplissage des dictionnaires avec notre menu
+# Filling dictionaries with our menu
 try:
-    fileini = open("config.ini", "r")       #fichier de configuration de notre menu
+    fileini = open("config.ini", "r")       # opening our menu configuration file
     for line in fileini :
-        key = int(line.split()[0])
-        name = line.split()[1]
-        path = line.split()[2]
-        listService[key] = name
-        listPlaybook[key] = path
+        key = int(line.split()[0])          # get the number
+        name = line.split()[1]              # get the service name
+        path = line.split()[2]              # get playbook model path
+        serviceList[key] = name             # put the service names in the correct dictionary
+        playbookList[key] = path            # put the paths in the correct dictionary
     fileini.close()
 except:
-    monLogger.error('problème avec le fichier config.ini')
+    myLogger.error('Problem with config.ini file')
 
-# récupère le nombre d'items dans notre menu
-tailleDic = len(listService)
+# get the number of items in our menu
+sizeDic = len(serviceList)
 
-# affiche notre menu
-for key, val in listService.items():
+# displays our menu
+print('\n\nAutomatic installation of services\n\n')
+for key, val in serviceList.items():
     print(key, " - ", val)
 
-print(0, " - sortie")   # Rajoute la sortie du programme
+print(0, " - exit")                          # Add program exit
 
-# Boucle de choix avec gestion des erreurs
-inputVal = input("Faites votre choix ")
+# Choice loop with error handling
+inputVal = input("\nChoose a service to install automatically:\n ")
 inputVal = int(inputVal)
-if inputVal == 0:
-    exit(0)
-elif inputVal > tailleDic:
-    print("Ce choix n'est pas dans la liste")
-else:
-#    print(listPlaybook[inputVal])  # Pour tests
-    plbook = listPlaybook[inputVal]
-#    plbook = "squid.yml"       # Pour tests
-    principal()
+try:
+    if inputVal == 0:
+        exit(0)
+    elif inputVal > sizeDic:
+        print("This choice is not in the list")
+    else:
+        plbook = playbookList[inputVal]
+        myProgram()
 
+except:
+    myLogger.error('You crashed my script, re-run it now!!!')
