@@ -13,6 +13,7 @@
 * Les autres serveurs auront un acces SSH en root avec le même mot de passe pour tous.
 * Les adresses IP des noeuds secondaires seront dans le fichier ipFile.txt.
 * Les templates d'Ansible seront dans le répertoire root/playbooks dans le noeud principal.
+* l'ensemble des fichiers seront installés et lancés dans le répertoire /root
 
 # Le script projet06.py
 

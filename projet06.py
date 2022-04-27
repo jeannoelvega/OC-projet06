@@ -154,7 +154,7 @@ def myProgram():
     serverChoice()
     ipModify()
     createFichyaml()
-    #installPlaybook()
+    installPlaybook()
     removeTemp()
 
 ########################## MENU ################################################################
