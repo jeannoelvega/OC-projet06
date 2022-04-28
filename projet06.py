@@ -21,26 +21,12 @@ myLogger = logging.getLogger('projet06.py')
 myLogger.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s -- %(name)s -- %(levelname)s -- %(message)s")
 
-# Check if log exists and should therefore be rolled
-rotation = os.path.isfile(logFile)
-
 # Add the log message handler to the logger
-handler = logging.handlers.RotatingFileHandler(logFile, mode='a', maxBytes=1000000, backupCount=20, encoding='utf-8')
+handler = logging.handlers.RotatingFileHandler(logFile, mode='a', maxBytes=1000, backupCount=2, encoding='utf-8')
 handler.setFormatter(formatter)
 myLogger.addHandler(handler)
 
-# This is a stale log, so roll it
-if rotation:    
-    # Add timestamp
-    myLogger.info('\n---------\nLog closed on %s.\n---------\n' % time.asctime())
-
-    # Roll over on application start
-    myLogger.handlers[0].doRollover()
-
-# Add timestamp
-myLogger.info('\n---------\nLog started on %s.\n---------\n' % time.asctime())
-
-# FONCTIONS
+# FUNCTIONS
 
 # Function for cleaning temporary files
 def removeTemp():
@@ -140,10 +126,11 @@ def copyfich():
 
 # Function that installs playbooks
 def installPlaybook():
+    global adrIp
     try:
         subprocess.call(["ansible-playbook", "/root/yamlFile.yml"])
-        print("Service installed at ", adrIp)
-        myLogger.info("Service installed at ", adrIp)
+        print("Service installed at " + str(adrIp) )
+        myLogger.info("Service installed at " + str(adrIp) )
     except:
         myLogger.error('Problem with launching yamlFile.yml playbook')
 
