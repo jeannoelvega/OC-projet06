@@ -87,6 +87,7 @@ def ipModify(adrIp):
 # Function that creates the temporary yaml file to launch the Ansible command
 def createFichyaml(adrIp):
     try:
+        adrIp = ' '.join(adrIp)
         ipFile = open(plbook, "r")              # open yaml template read-only
         line = ipFile.readlines()               # save each line to a list
         ipFile.close()                          # close the yaml template
@@ -181,4 +182,4 @@ try:
         myProgram()
 
 except:
-    myLogger.error('You crashed my script, re-run it now!!!')
+    myLogger.error('aborted script')
