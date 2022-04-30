@@ -1,6 +1,3 @@
-# global variables
-global adrIp, adressIp, plbook
-
 # MODULES 
 # Allows to launch commands with the system
 import subprocess
@@ -66,8 +63,7 @@ def serverChoice():
     return adrIp
 
 # Function that changes the line where the IP was free to IP used
-def ipModify():
-    global adrIp                 
+def ipModify(adrIp):                 
     adrIp = ' '.join(adrIp)                     # put adrIp in string format
     word = adrIp  
     try:
@@ -89,8 +85,7 @@ def ipModify():
     myLogger.info('ipFile.txt modified correctly')
 
 # Function that creates the temporary yaml file to launch the Ansible command
-def createFichyaml():
-    global adrIp
+def createFichyaml(adrIp):
     try:
         ipFile = open(plbook, "r")              # open yaml template read-only
         line = ipFile.readlines()               # save each line to a list
@@ -111,7 +106,7 @@ def createFichyaml():
 
 # Function that creates a temporary file for finding
 # and changing the state of IP addresses
-def copyfich():
+def copyfile():
 # copy the IP addresses file identically to a temporary file
     try:
         ipFile = open("ipFile.txt", "r")
@@ -125,8 +120,7 @@ def copyfich():
     myLogger.info('Creation of copy of ipFile.txt completed')
 
 # Function that installs playbooks
-def installPlaybook():
-    global adrIp
+def installPlaybook(adrIp):
     try:
         subprocess.call(["ansible-playbook", "/root/yamlFile.yml"])
         print("Service installed at " + str(adrIp) )
@@ -137,11 +131,11 @@ def installPlaybook():
 # Main function which launches the other functions in order
 def myProgram():
 
-    copyfich()
-    serverChoice()
-    ipModify()
-    createFichyaml()
-    installPlaybook()
+    copyfile()
+    ipAdress = serverChoice()
+    ipModify(ipAdress)
+    createFichyaml(ipAdress)
+    installPlaybook(ipAdress)
     removeTemp()
 
 ########################## MENU ################################################################
